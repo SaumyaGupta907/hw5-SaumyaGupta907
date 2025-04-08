@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vertical Search</title>
+</head>
+
+<body>
+    <h1>Vertical Search</h1>
+    <form action="/" method="post">
+        <label for="query">Enter your query:</label>
+        <input type="text" id="query" name="query">
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <br> {% if results %}
+    <table border="2">
+        <tr>
+            <th>Rank</th>
+            <th>URL</th>
+            <th>Assessment</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.rank }}</td>
+            <td><a href="{{ result.url }}" target="_blank">{{ result.url }}</a></td>
+            <td>
+              <select id={{result.url}}> 
+                <option value="none">None</option>
+                <option value="not_relevant">Not Relevant</option>
+                <option value="relevant">Relevant</option>
+                <option value="very_relevant">Very Relevant</option>
+              </select>
+            </td>
+        </tr>
+        {% endfor %}
+        <button type="submit" onclick="getRelevance()">Submit</button>
+    </table>
+    {% endif %}
+    
+    <script>
+        function getRelevance(){
+            var search_list = document.getElementsByTagName("select");
+            var content = ""; // Variable to store the logged content
+            const mapping = new Map([
+                    ["very_relevant", 2],
+                    ["relevant", 1],
+                    ["not_relevant", 0]
+                ])
+
+            for(var i = 0; i < search_list.length; i++){
+                if(search_list[i].value != "none"){
+                    // Construct the content to log
+
+                    var logContent = "QueryID" + "  " + "Saumya_Gupta"+ "  " + search_list[i].id + " " + mapping.get(search_list[i].value) + "\n";
+                    
+                    // Log the content to console and store it in the 'content' variable
+                    console.log(logContent);
+                    content += logContent;
+                }
+            }
+
+            // Create a Blob containing the logged content
+            var blob = new Blob([content], { type: 'text/plain' });
+
+            // Create a temporary URL for the Blob
+            var url = window.URL.createObjectURL(blob);
+
+            // Create a link element and prompt user to download the text file
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "logged_content.txt";
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+    </script>
+    </body>
+
+</body>
+
+</html>
